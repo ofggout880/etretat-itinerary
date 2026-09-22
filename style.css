@@ -242,3 +242,27 @@ body, html {
 }
 .menu-btn .material-icons { margin-right: 12px; color: #8ab4f8; }
 .menu-btn:hover { background: #3a3a3a; }
+
+/* Geolocation Button */
+#geolocate-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: #1e1e1e;
+    color: #fff;
+    border: 2px solid #333;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    z-index: 50; /* Above the map, below the slide-up panel (z-index 100) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    transition: background 0.2s, color 0.2s;
+}
+
+#geolocate-btn:hover {
+    background: #333;
+}

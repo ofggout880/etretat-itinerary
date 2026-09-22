@@ -363,3 +363,60 @@ document.getElementById('close-budget-btn').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     renderStepsWithTravelTimes(null);
 });
+
+// Geolocation Feature
+const geoBtn = document.getElementById('geolocate-btn');
+let userMarker = null;
+
+geoBtn.addEventListener('click', () => {
+    if (navigator.geolocation) {
+        geoBtn.style.color = '#8ab4f8'; // Indicate active/loading state
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                };
+                
+                // Add or update the blue dot for the user
+                if (!userMarker) {
+                    userMarker = new google.maps.Marker({
+                        position: pos,
+                        map: map,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale: 8,
+                            fillColor: "#4285F4",
+                            fillOpacity: 1,
+                            strokeColor: "#ffffff",
+                            strokeWeight: 2,
+                        },
+                        title: "Votre position",
+                        zIndex: 999
+                    });
+                } else {
+                    userMarker.setPosition(pos);
+                }
+                
+                // Center map on user
+                map.panTo(pos);
+                map.setZoom(14);
+                
+                setTimeout(() => { geoBtn.style.color = '#fff'; }, 1000);
+            },
+            (error) => {
+                console.error("Geolocation error:", error);
+                alert("Impossible de vous localiser. Vérifiez que vous avez autorisé l'accès à la position.");
+                geoBtn.style.color = '#fff';
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        alert("Votre navigateur ne supporte pas la géolocalisation.");
+    }
+});
