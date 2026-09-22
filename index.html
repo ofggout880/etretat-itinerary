@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Itinéraire Étretat - Google Maps Dark Mode</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -10,29 +10,27 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- Sidebar -->
-        <div id="sidebar">
-            <div class="sidebar-header">
-                <div class="search-box">
-                    <span class="material-icons search-icon">menu</span>
-                    <input type="text" value="Itinéraire Étretat (9h - 18h)" readonly>
-                    <span class="material-icons search-icon">search</span>
-                </div>
-                <div class="itinerary-summary">
-                    <h2>Journée à Étretat</h2>
-                    <p>1 jour • 5 lieux • En Voiture</p>
-                    <div style="display: flex; gap: 8px;">
-                        <button id="btn-infos" class="info-btn"><span class="material-icons">info</span>Bonnes pratiques</button>
-                        <button id="btn-budget" class="info-btn"><span class="material-icons">euro</span>Budget</button>
-                    </div>
-                </div>
+        
+        <!-- Header & Horizontal Slider -->
+        <div id="top-section">
+            <div class="search-box">
+                <span class="material-icons search-icon" id="burger-menu-btn">menu</span>
+                <input type="text" value="Itinéraire Étretat (9h - 18h)" readonly>
+                <span class="material-icons search-icon">search</span>
             </div>
             
-            <div id="places-list"></div>
+            <div id="horizontal-steps">
+                <!-- Javascript will populate this -->
+            </div>
+        </div>
 
-            <!-- Detail View Panel -->
-            <div id="detail-panel">
-                <button id="back-btn" class="material-icons">arrow_back</button>
+        <!-- Map -->
+        <div id="map-container">
+            <div id="map"></div>
+            
+            <!-- Detail View Panel (Slides up) -->
+            <div id="detail-panel" class="slide-up-panel">
+                <button id="back-btn" class="material-icons">close</button>
                 <div id="detail-image" class="detail-hero-image"></div>
                 <div class="detail-content">
                     <h2 id="detail-title">Title</h2>
@@ -86,8 +84,8 @@
             </div>
 
             <!-- Infos Utiles Panel -->
-            <div id="infos-panel">
-                <button id="close-infos-btn" class="material-icons">close</button>
+            <div id="infos-panel" class="slide-up-panel">
+                <button id="close-infos-btn" class="material-icons close-btn-top">close</button>
                 <div class="detail-content">
                     <h2 style="margin-bottom: 20px; color: #fff;"><span class="material-icons" style="vertical-align: middle; margin-right: 8px;">local_parking</span>Guide Pratique Étretat</h2>
                     
@@ -95,7 +93,7 @@
                         <h3>🚗 Stationnement & Parkings</h3>
                         <p>Le centre-ville (Zone Rouge) est payant tous les jours de 9h à 19h et souvent saturé.</p>
                         <ul>
-                            <li><strong>Le bon plan gratuit :</strong> Parking de la route de Criquetot-l'Esneval (à l'entrée du village). Non goudronné, 15-20 min à pied du centre. Arrivez très tôt !</li>
+                            <li><strong>Le bon plan gratuit :</strong> Parking de la route de Criquetot-l'Esneval. Non goudronné, 15-20 min à pied du centre. Arrivez très tôt !</li>
                             <li><strong>Parkings conseillés (payants) :</strong> Parking du Grand Val ou Parking de la Gare.</li>
                             <li><strong>Interdit :</strong> Stationnement/circulation interdits en haut de la falaise d'Amont.</li>
                             <li><strong>Paiement :</strong> Utilisez l'application PayByPhone.</li>
@@ -115,21 +113,11 @@
             </div>
 
             <!-- Budget Panel -->
-            <div id="budget-panel">
-                <button id="close-budget-btn" class="material-icons">close</button>
+            <div id="budget-panel" class="slide-up-panel">
+                <button id="close-budget-btn" class="material-icons close-btn-top">close</button>
                 <div class="detail-content">
                     <h2 style="margin-bottom: 20px; color: #fff;"><span class="material-icons" style="vertical-align: middle; margin-right: 8px;">account_balance_wallet</span>Budget du Projet</h2>
                     
-                    <div class="info-section">
-                        <h3>📈 Suivi Google API (Ce projet Web)</h3>
-                        <p><strong>Coût actuel estimé :</strong> 0.00 €</p>
-                        <ul>
-                            <li><strong>Forfait Mensuel Google :</strong> 200 $ (Gratuit)</li>
-                            <li><strong>Requêtes utilisées :</strong> ~10 (sur 28 500 gratuites)</li>
-                            <li><strong>Risque de dépassement :</strong> Nul (si le quota est activé sur Google Cloud).</li>
-                        </ul>
-                    </div>
-
                     <div class="info-section">
                         <h3>💶 Budget Voyage (Étretat)</h3>
                         <p>Estimation des coûts pour la journée sur place :</p>
@@ -143,10 +131,22 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
-        <!-- Map -->
-        <div id="map"></div>
+        <!-- Burger Side Menu -->
+        <div id="burger-menu" class="side-menu">
+            <div class="side-menu-header">
+                <h2>Menu</h2>
+                <button id="close-menu-btn" class="material-icons">close</button>
+            </div>
+            <div class="side-menu-content">
+                <button id="btn-infos" class="menu-btn"><span class="material-icons">info</span>Bonnes pratiques</button>
+                <button id="btn-budget" class="menu-btn"><span class="material-icons">euro</span>Budget</button>
+            </div>
+        </div>
+        <div id="menu-overlay"></div>
+
     </div>
 
     <!-- REPLACE "VOTRE_CLE_API" WITH YOUR ACTUAL GOOGLE MAPS API KEY -->

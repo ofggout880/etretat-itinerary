@@ -97,47 +97,95 @@ const placesData = [
   }
 ];
 
+// Dark mode map style
+const mapStyle = [
+    { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+    {
+      featureType: 'administrative.locality',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#d59563' }]
+    },
+    {
+      featureType: 'poi',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#d59563' }]
+    },
+    {
+      featureType: 'poi.park',
+      elementType: 'geometry',
+      stylers: [{ color: '#263c3f' }]
+    },
+    {
+      featureType: 'poi.park',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#6b9a76' }]
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry',
+      stylers: [{ color: '#38414e' }]
+    },
+    {
+      featureType: 'road',
+      elementType: 'geometry.stroke',
+      stylers: [{ color: '#212a37' }]
+    },
+    {
+      featureType: 'road',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#9ca5b3' }]
+    },
+    {
+      featureType: 'road.highway',
+      elementType: 'geometry',
+      stylers: [{ color: '#746855' }]
+    },
+    {
+      featureType: 'road.highway',
+      elementType: 'geometry.stroke',
+      stylers: [{ color: '#1f2835' }]
+    },
+    {
+      featureType: 'road.highway',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#f3d19c' }]
+    },
+    {
+      featureType: 'water',
+      elementType: 'geometry',
+      stylers: [{ color: '#17263c' }]
+    },
+    {
+      featureType: 'water',
+      elementType: 'labels.text.fill',
+      stylers: [{ color: '#515c6d' }]
+    },
+    {
+      featureType: 'water',
+      elementType: 'labels.text.stroke',
+      stylers: [{ color: '#17263c' }]
+    }
+  ];
+
 let map;
 let directionsService;
 let directionsRenderer;
-let markers = [];
 
-window.initMap = function() {
-    // Dark mode style for Google Maps
-    const darkMapStyle = [
-      { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
-      { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
-      { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
-      { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
-      { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
-      { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }] },
-      { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }] },
-      { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
-      { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
-      { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
-      { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }] },
-      { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }] },
-      { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }] },
-      { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f3948" }] },
-      { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
-      { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
-      { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
-      { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }] }
-    ];
-
-    map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: { lat: 49.698, lng: 0.190 },
-        styles: darkMapStyle,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 9,
+        center: { lat: 49.3, lng: 1.2 }, // Center between Paris and Etretat
+        styles: mapStyle,
+        disableDefaultUI: true,
+        zoomControl: true,
     });
 
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({
         map: map,
-        suppressMarkers: true,
+        suppressMarkers: true, // We will draw our own emoji markers
         polylineOptions: {
             strokeColor: '#8ab4f8',
             strokeOpacity: 0.8,
@@ -145,125 +193,121 @@ window.initMap = function() {
         }
     });
 
-    renderPlacesList();
-    addMarkersAndRoute();
     addParkingZones();
-    setupUI();
-};
+    addMarkersAndRoute();
+}
 
-function renderPlacesList() {
-    const listContainer = document.getElementById('places-list');
-    listContainer.innerHTML = '';
-
-    placesData.forEach((place, index) => {
-        const placeEl = document.createElement('div');
-        placeEl.className = 'place-item';
-        placeEl.onclick = () => showDetail(place);
-
-        placeEl.innerHTML = `
-            <div class="place-number">${index + 1}</div>
-            <div class="place-content">
-                <h3>${place.name}</h3>
-                <div class="place-time">${place.time} <span style="color: #666; font-size: 11px; margin-left: 6px;">(${place.duration})</span></div>
-                <div class="place-desc">${place.description}</div>
-            </div>
-            <img src="${place.image}" class="place-image" alt="${place.name}">
-        `;
-        
-        listContainer.appendChild(placeEl);
-    });
+function createEmojiMarkerSVG(emoji) {
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/200.svg" viewBox="0 0 40 40" width="40" height="40">
+            <path d="M20 0C11.163 0 4 7.163 4 16c0 10.667 16 24 16 24s16-13.333 16-24c0-8.837-7.163-16-16-16z" fill="#1e1e1e" stroke="#8ab4f8" stroke-width="2"/>
+            <text x="20" y="22" font-size="16" text-anchor="middle" font-family="Arial" dominant-baseline="central">${emoji}</text>
+        </svg>
+    `);
 }
 
 function addMarkersAndRoute() {
-    const waypoints = [];
-
-    placesData.forEach((place, index) => {
-        const position = { lat: place.lat, lng: place.lng };
-        
-        if (index > 0 && index < placesData.length - 1) {
-            waypoints.push({
-                location: position,
-                stopover: true
-            });
-        }
-
-        const svgMarker = (emoji) => ({
-            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-                    <path d="M20,0 C11.16,0 4,7.16 4,16 C4,28 20,40 20,40 C20,40 36,28 36,16 C36,7.16 28.84,0 20,0 Z" fill="#1e1e1e" stroke="#8ab4f8" stroke-width="2"/>
-                    <text x="50%" y="42%" dominant-baseline="middle" text-anchor="middle" font-size="18">${emoji}</text>
-                </svg>`),
-            scaledSize: new google.maps.Size(40, 40),
-            anchor: new google.maps.Point(20, 40)
-        });
-
-        const marker = new google.maps.Marker({
-            position: position,
+    // Add custom markers
+    placesData.forEach(place => {
+        new google.maps.Marker({
+            position: { lat: place.lat, lng: place.lng },
             map: map,
             title: place.name,
-            icon: svgMarker(place.emoji)
+            icon: {
+                url: createEmojiMarkerSVG(place.emoji),
+                scaledSize: new google.maps.Size(40, 40),
+                anchor: new google.maps.Point(20, 40)
+            }
         });
-
-        marker.addListener('click', () => {
-            showDetail(place);
-        });
-
-        markers.push(marker);
     });
 
     // Calculate Route
-    const request = {
-        origin: { lat: placesData[0].lat, lng: placesData[0].lng },
-        destination: { lat: placesData[placesData.length - 1].lat, lng: placesData[placesData.length - 1].lng },
-        waypoints: waypoints,
+    directionsService.route({
+        origin: placesData[0], // Paris
+        destination: placesData[placesData.length - 1], // Jardins
+        waypoints: placesData.slice(1, -1).map(place => ({
+            location: new google.maps.LatLng(place.lat, place.lng),
+            stopover: true
+        })),
         travelMode: google.maps.TravelMode.DRIVING
-    };
-
-    directionsService.route(request, (result, status) => {
-        if (status == 'OK') {
-            directionsRenderer.setDirections(result);
-
-            // Extract travel times from Google Navigation Data
-            const legs = result.routes[0].legs;
-            const listContainer = document.getElementById('places-list');
-            const items = listContainer.getElementsByClassName('place-item');
-
-            for (let i = 0; i < legs.length; i++) {
-                const duration = legs[i].duration.text;
-                const distance = legs[i].distance.text;
-                const fromName = placesData[i].name;
-                const toName = placesData[i+1].name;
-                
-                const travelEl = document.createElement('div');
-                travelEl.className = 'travel-time-row';
-                travelEl.innerHTML = `<span class="material-icons" style="font-size: 16px; margin-right: 8px;">directions_car</span> ${duration} de trajet de ${fromName} à ${toName} (${distance})`;
-                
-                // Insert the travel time indicator just after the current place item
-                if (items[i]) {
-                    items[i].insertAdjacentElement('afterend', travelEl);
-                }
-            }
-
+    }, (response, status) => {
+        if (status === 'OK') {
+            directionsRenderer.setDirections(response);
+            renderStepsWithTravelTimes(response.routes[0].legs);
         } else {
             console.error('Directions request failed due to ' + status);
-            alert("L'itinéraire n'a pas pu être calculé (Erreur: " + status + "). \n\nAssurez-vous d'avoir bien activé 'Directions API' dans votre console Google Cloud, sans quoi les temps de trajet et le tracé ne s'afficheront pas !");
+            alert("Erreur de calcul de l'itinéraire. Vérifiez que la Directions API est activée et que les restrictions sont correctes.");
+            renderStepsWithTravelTimes([]);
         }
     });
 }
 
-function showDetail(place) {
-    const panel = document.getElementById('detail-panel');
-    
-    document.getElementById('detail-image').style.backgroundImage = `url('${place.image}')`;
+function addParkingZones() {
+    const etretatCenterCoords = [
+        { lat: 49.7090, lng: 0.2010 },
+        { lat: 49.7075, lng: 0.2055 },
+        { lat: 49.7050, lng: 0.2030 },
+        { lat: 49.7065, lng: 0.1985 }
+    ];
+
+    const parkingPolygon = new google.maps.Polygon({
+        paths: etretatCenterCoords,
+        strokeWeight: 0,
+        fillColor: '#FF0000',
+        fillOpacity: 0.15,
+        map: map
+    });
+}
+
+// Render horizontal slider
+function renderStepsWithTravelTimes(legs) {
+    const container = document.getElementById('horizontal-steps');
+    container.innerHTML = '';
+
+    placesData.forEach((place, index) => {
+        const card = document.createElement('div');
+        card.className = 'step-card';
+        card.onclick = () => showPlaceDetails(place.id);
+
+        let innerHTML = `
+            <div class="step-header">
+                <div class="step-number">${place.id}</div>
+                <div class="step-time">${place.time}</div>
+            </div>
+            <h3>${place.name}</h3>
+            <p>${place.description}</p>
+        `;
+
+        if (legs && legs[index]) {
+            const leg = legs[index];
+            innerHTML += `
+                <div class="step-travel">
+                    <span class="material-icons">directions_car</span>
+                    ${leg.duration.text} de trajet
+                </div>
+            `;
+        }
+
+        card.innerHTML = innerHTML;
+        container.appendChild(card);
+    });
+}
+
+// UI Interactions
+function showPlaceDetails(id) {
+    const place = placesData.find(p => p.id === id);
+    if (!place) return;
+
     document.getElementById('detail-title').innerText = place.name;
-    document.getElementById('detail-score').innerText = place.reviews;
-    document.getElementById('detail-reviews-count').innerText = `(${place.reviewsCount} avis)`;
     document.getElementById('detail-time').innerText = place.time;
     document.getElementById('detail-duration').innerText = place.duration;
     document.getElementById('detail-hours').innerText = place.hours;
+    document.getElementById('detail-score').innerText = place.reviews;
+    document.getElementById('detail-reviews-count').innerText = `(${place.reviewsCount} avis)`;
     document.getElementById('detail-description').innerText = place.description;
     document.getElementById('detail-todo').innerText = place.todo;
-    
+    document.getElementById('detail-image').style.backgroundImage = `url('${place.image}')`;
+
     const warningEl = document.getElementById('detail-warning');
     if (place.warning) {
         warningEl.classList.remove('hidden');
@@ -272,64 +316,45 @@ function showDetail(place) {
         warningEl.classList.add('hidden');
     }
 
-    panel.classList.add('active');
-
+    document.getElementById('detail-panel').classList.add('active');
+    
+    // Zoom on map
     if (map) {
         map.panTo({ lat: place.lat, lng: place.lng });
-        map.setZoom(16);
+        map.setZoom(15);
     }
 }
 
-function setupUI() {
-    document.getElementById('back-btn').addEventListener('click', () => {
-        document.getElementById('detail-panel').classList.remove('active');
-        if (map) {
-            map.setZoom(14);
-            map.panTo({ lat: 49.698, lng: 0.190 });
-        }
-    });
+// Burger menu listeners
+document.getElementById('burger-menu-btn').addEventListener('click', () => {
+    document.getElementById('burger-menu').classList.add('active');
+    document.getElementById('menu-overlay').classList.add('active');
+});
 
-    document.getElementById('btn-infos').addEventListener('click', () => {
-        document.getElementById('infos-panel').classList.add('active');
-    });
-
-    document.getElementById('close-infos-btn').addEventListener('click', () => {
-        document.getElementById('infos-panel').classList.remove('active');
-    });
-
-    document.getElementById('btn-budget').addEventListener('click', () => {
-        document.getElementById('budget-panel').classList.add('active');
-    });
-
-    document.getElementById('close-budget-btn').addEventListener('click', () => {
-        document.getElementById('budget-panel').classList.remove('active');
-    });
+function closeBurgerMenu() {
+    document.getElementById('burger-menu').classList.remove('active');
+    document.getElementById('menu-overlay').classList.remove('active');
 }
 
-function addParkingZones() {
-    // Coordonnées ajustées du centre-ville d'Étretat (Zone payante / difficile)
-    // Englobe toute la vallée entre la plage, et les deux routes principales
-    const redZoneCoords = [
-        { lat: 49.7073, lng: 0.1970 }, // NW (Plage côté Aval)
-        { lat: 49.7088, lng: 0.2045 }, // NE (Plage côté Amont)
-        { lat: 49.7042, lng: 0.2110 }, // SE (Entrée ville route Fécamp)
-        { lat: 49.7020, lng: 0.2035 }, // SW (Entrée ville route du Havre)
-    ];
+document.getElementById('close-menu-btn').addEventListener('click', closeBurgerMenu);
+document.getElementById('menu-overlay').addEventListener('click', closeBurgerMenu);
 
-    const redZone = new google.maps.Polygon({
-        paths: redZoneCoords,
-        strokeWeight: 0,
-        fillColor: "#FF4444",
-        fillOpacity: 0.15,
-        map: map,
-    });
+// Panels interactions
+document.getElementById('btn-infos').addEventListener('click', () => {
+    closeBurgerMenu();
+    document.getElementById('infos-panel').classList.add('active');
+});
+document.getElementById('btn-budget').addEventListener('click', () => {
+    closeBurgerMenu();
+    document.getElementById('budget-panel').classList.add('active');
+});
 
-    const infoWindow = new google.maps.InfoWindow({
-        content: "<div style='color: black; padding: 5px;'><strong>🛑 Zone Rouge (Centre-ville)</strong><br>Stationnement payant et très difficile.<br>Privilégiez les parkings extérieurs.</div>"
-    });
-
-    redZone.addListener("click", (event) => {
-        infoWindow.setPosition(event.latLng);
-        infoWindow.open(map);
-    });
-}
+document.getElementById('back-btn').addEventListener('click', () => {
+    document.getElementById('detail-panel').classList.remove('active');
+});
+document.getElementById('close-infos-btn').addEventListener('click', () => {
+    document.getElementById('infos-panel').classList.remove('active');
+});
+document.getElementById('close-budget-btn').addEventListener('click', () => {
+    document.getElementById('budget-panel').classList.remove('active');
+});
