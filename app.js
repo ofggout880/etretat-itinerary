@@ -199,7 +199,7 @@ function initMap() {
 
 function createEmojiMarkerSVG(emoji) {
     return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/200.svg" viewBox="0 0 40 40" width="40" height="40">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
             <path d="M20 0C11.163 0 4 7.163 4 16c0 10.667 16 24 16 24s16-13.333 16-24c0-8.837-7.163-16-16-16z" fill="#1e1e1e" stroke="#8ab4f8" stroke-width="2"/>
             <text x="20" y="22" font-size="16" text-anchor="middle" font-family="Arial" dominant-baseline="central">${emoji}</text>
         </svg>
