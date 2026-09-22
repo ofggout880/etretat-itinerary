@@ -358,3 +358,8 @@ document.getElementById('close-infos-btn').addEventListener('click', () => {
 document.getElementById('close-budget-btn').addEventListener('click', () => {
     document.getElementById('budget-panel').classList.remove('active');
 });
+
+// Initialize UI immediately (don't wait for Google Maps)
+document.addEventListener('DOMContentLoaded', () => {
+    renderStepsWithTravelTimes(null);
+});
